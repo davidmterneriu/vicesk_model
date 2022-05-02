@@ -213,7 +213,7 @@ tictoc::toc()
 
 write_csv(fig1_df,"~/Desktop/IU/INFO/I609/Final Project/fig1_df.csv")
 
-fig1_df=write_csv("~/Desktop/IU/INFO/I609/Final Project/fig1_df.csv")
+fig1_df=read_csv("~/Desktop/IU/INFO/I609/Final Project/fig1_df.csv")
 
 fig1_df%>%
   mutate(N1=as.character(N)%>%factor(c(40,100,400)))%>%
