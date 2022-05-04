@@ -128,6 +128,74 @@ vicsek_fn=function(N=100,L=1,vel=0.5,eta=0.3,R=1,steps=100){
 }
 
 
+################################################################################
+# Rho and eta 
+################################################################################
+
+
+param_df2=expand.grid(rho=10^seq(-1,1,length.out=20),eta=seq(0,5,length.out=20))%>%
+  as.data.frame()
+param_df2$N=40
+param_df2$L=sqrt(param_df2$N/param_df2$rho)
+
+
+fig2_df=data.frame()
+
+tictoc::tic()
+#nrow(fig1_par_df)
+for(i in 1:nrow(param_df2)){
+  N1=param_df2$N[i]
+  L1=param_df2$L[i]
+  eta1=param_df2$eta[i]
+  temp_res=data.frame()
+  
+  
+  for(t in 1:10){
+    mes1= paste0("i: ",signif(i/nrow(param_df2),3),"|| t: ",t/50)
+    print(mes1)
+    temp_res=rbind( temp_res,vicsek_fn(N=N1,L=L1,vel=0.03,R=1,eta= eta1)$order)
+  }
+  res_vec=temp_res$order_par[temp_res$steps>79]
+  mean_order=mean(res_vec)
+  se_mean=sd(res_vec)/sqrt(length(res_vec))
+  
+  fig2_df=rbind(fig2_df,
+                data.frame(N=N1,L=L1,
+                           order= mean_order,
+                           std.err=se_mean))
+  
+  
+  
+}
+
+tictoc::toc()
+
+
+fig2_df$eta=param_df2$eta
+fig2_df$rho=param_df2$rho
+
+fig2_df%>%
+  ggplot(aes(x=eta,y=rho,z=order))+
+  geom_contour_filled(binwidth = 0.05)+
+  scale_fill_viridis_d(option="C")+
+  theme_minimal()+
+  labs(x=TeX("$\\eta$"),
+       y=TeX("$\\rho$"),
+       fill=TeX("$v_a$"))+
+  scale_y_continuous(breaks = scales::pretty_breaks())+
+  scale_x_continuous(breaks = scales::pretty_breaks())+
+  guides(fill=guide_legend(nrow = 2))+
+  theme(legend.position = "bottom",
+        axis.title.y = element_text(angle = 0),
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"))
+  
+  
+
+
+
 
 
 ###############################################################################
